@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 2 Ableitungsregeln</title>
+<style>
+  :root{--bg:#f4f7fb;--card:#fff;--ink:#1d2433;--muted:#5b6578;--accent:#2563eb;--ok:#15803d;--okbg:#e7f6ec;--bad:#b91c1c;--badbg:#fdecec;--line:#d9e0ec;--warn:#fff7e0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  h1{font-size:1.5rem;margin:8px 0 4px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:0;padding:12px 18px;background:var(--accent);color:#fff;font-weight:600}
+  button.sec{background:#e8eefc;color:var(--accent)}
+  .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+  .bar>div{height:100%;background:var(--accent);width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem}
+  .lvl{font-weight:700;color:var(--accent);margin:4px 0 2px}
+  .tip{background:var(--warn);border-radius:10px;padding:8px 12px;font-size:.92rem;margin:6px 0 12px}
+  .q{font-size:1.2rem;font-weight:600;margin:6px 0 14px}
+  .gbox{text-align:center;margin:0 0 12px}
+  .gbox svg{width:100%;max-width:420px;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:2px solid var(--line);margin-bottom:10px;padding:12px 14px;font-weight:500}
+  .opt:hover:not(:disabled){border-color:var(--accent)}
+  .opt.ok{background:var(--okbg);border-color:var(--ok)}
+  .opt.bad{background:var(--badbg);border-color:var(--bad)}
+  .opt:disabled{opacity:1;cursor:default}
+  .fb{margin-top:6px;padding:12px 14px;border-radius:10px}
+  .fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)}
+  .hide{display:none}
+  .score{font-size:2.2rem;font-weight:800;margin:0}
+  .small{font-size:.9rem;color:var(--muted)}
+  .proof{border:2px dashed var(--accent);border-radius:12px;padding:14px;background:#f0f4ff;margin:10px 0}
+  .proof table{border-collapse:collapse;width:100%;margin-top:6px}
+  .proof td{padding:3px 0;border-bottom:1px solid #d6def0;font-size:.95rem}
+  .proof td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+  sup,sub{line-height:0}
+  .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;line-height:1.15;margin:0 2px}
+  .fr>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Quiz 2: Ableitungsregeln pauken</h1>
+  <p class="sub">M BOS 12 · Selbstkontrolle · 8 Stufen von leicht bis schwer</p>
+
+  <div id="start" class="card">
+    <p style="margin-top:0"><strong>So geht's:</strong> Dieses Quiz ist zum <strong>Pauken</strong> der Ableitungsregeln gedacht. Es beginnt ganz leicht und wird in 8 Stufen schwerer. Rechnen Sie jede Aufgabe zuerst auf Ihrem Notizblatt und wählen Sie erst danach die Antwort aus. Bei jeder Antwort sehen Sie die Rechnung Term für Term.</p>
+    <p>Am Ende können Sie in einer <strong>Übungsrunde</strong> Ihre Fehler wiederholen. Machen Sie von der Ergebnisseite einen Screenshot oder ein Foto und geben Sie es in Teams ab.</p>
+    <p class="small">Es werden keine Daten gespeichert oder versendet.</p>
+    <button id="go">Quiz starten</button>
+  </div>
+
+  <div id="quiz" class="card hide">
+    <div class="meta"><span id="count"></span><span id="pts"></span></div>
+    <div class="bar"><div id="prog"></div></div>
+    <div class="lvl" id="lvl"></div>
+    <div class="tip" id="tip"></div>
+    <div id="qtext" class="q"></div>
+    <div id="gbox" class="gbox hide"></div>
+    <div id="opts"></div>
+    <div id="fb" class="fb hide"></div>
+    <p><button id="next" class="hide">Weiter</button></p>
+  </div>
+
+  <div id="end" class="card hide">
+    <p class="score" id="final"></p>
+    <p id="verdict"></p>
+    <div class="proof">
+      <strong>Ihr Ergebnis (Screenshot oder Foto für Teams)</strong>
+      <table>
+        <tr><td id="ptitle"></td><td id="ptotal"></td></tr>
+        <tr><td>Datum</td><td id="pdate"></td></tr>
+      </table>
+      <table id="plevels"></table>
+    </div>
+    <p id="note" style="font-weight:700;color:#15803d"></p>
+    <p><button id="practice" class="hide">Fehler nochmal üben</button></p>
+    <p class="small">Tipp: Notieren Sie auf Ihrem Notizblatt, bei welchen Aufgaben Sie Fehler gemacht haben und warum. Danach können Sie das Quiz erneut starten.</p>
+    <p><button class="sec" id="again">Quiz neu starten</button></p>
+  </div>
+</div>
+<script>
+
+const CFG = {
+  title:'Quiz 2: Ableitungsregeln pauken',
+  levelWord:'Stufe', shuffleWithin:true,
+  levels:[
+    {name:'Potenzregel', tip:'<strong>Potenzregel:</strong> f(x) = x<sup>n</sup> → f′(x) = n · x<sup>n−1</sup>'},
+    {name:'Mit Faktor', tip:'<strong>Faktorregel:</strong> Der Faktor bleibt stehen und wird mit dem Exponenten multipliziert. (c · x<sup>n</sup>)′ = c · n · x<sup>n−1</sup>'},
+    {name:'x allein und Konstanten', tip:'<strong>Merke:</strong> (c · x)′ = c und eine Konstante wird beim Ableiten zu 0.'},
+    {name:'Summen', tip:'<strong>Summenregel:</strong> Jeder Summand wird einzeln abgeleitet.'},
+    {name:'Vorzeichen', tip:'<strong>Achtung:</strong> Das Vorzeichen vor einem Summanden bleibt beim Ableiten erhalten. Konstanten fallen weg.'},
+    {name:'Dezimalzahlen und Brüche', tip:'<strong>Tipp:</strong> Rechnen Sie Faktor mal Exponent, auch bei Dezimalzahlen und Brüchen.'},
+    {name:'Erst ausmultiplizieren', tip:'<strong>Merke:</strong> Produkte können wir noch nicht direkt ableiten. Erst ausmultiplizieren, dann ableiten.'},
+    {name:'Steigung an einer Stelle', tip:'<strong>Vorgehen:</strong> Erst f′(x) bilden, dann die Stelle x<sub>0</sub> in f′ einsetzen (nicht in f!).'}
+  ],
+  verdict:['Sehr gut! Die Ableitungsregeln sitzen.','Gut! Üben Sie die Aufgaben mit Fehlern in der Übungsrunde noch einmal.','Noch Luft nach oben: Schauen Sie Ihr Notizblatt mit den Regeln an und nutzen Sie die Übungsrunde.']
+};
+
+// ---------- kleine Rechen-Engine mit Brüchen ----------
+const MINUS='−';
+function gcd(a,b){a=Math.abs(a);b=Math.abs(b);while(b){[a,b]=[b,a%b];}return a||1;}
+function R(n,d){ d=(d===undefined?1:d); if(d<0){n=-n;d=-d;} const g=gcd(n,d); return {n:n/g,d:d/g}; }
+const rmul=(a,b)=>R(a.n*b.n,a.d*b.d);
+const radd=(a,b)=>R(a.n*b.d+b.n*a.d,a.d*b.d);
+const rneg=a=>R(-a.n,a.d);
+const req=(a,b)=>a.n===b.n&&a.d===b.d;
+function T(n,e,d){ return {c:R(n,d||1), e:e}; }
+function isTerm(d){ while(d%2===0)d/=2; while(d%5===0)d/=5; return d===1; }
+function fmtNum(r,mode){ // r >= 0
+  if(r.d===1) return String(r.n);
+  if(mode==='dec' && isTerm(r.d)) return String(+(r.n/r.d).toFixed(4)).replace('.',',');
+  return '<span class="fr"><span>'+r.n+'</span><span>'+r.d+'</span></span>';
+}
+function termBody(t,mode){
+  const mag=R(Math.abs(t.c.n),t.c.d);
+  if(t.e===0) return fmtNum(mag,mode);
+  const cf=(mag.n===1&&mag.d===1)?'':fmtNum(mag,mode);
+  return cf+(t.e===1?'x':'x<sup>'+t.e+'</sup>');
+}
+function polyStr(ts,mode){
+  ts=ts.filter(t=>t.c.n!==0).slice().sort((a,b)=>b.e-a.e);
+  if(!ts.length) return '0';
+  let s='';
+  ts.forEach((t,i)=>{
+    const neg=t.c.n<0;
+    if(i===0) s+=(neg?MINUS:'')+termBody(t,mode);
+    else s+=(neg?' '+MINUS+' ':' + ')+termBody(t,mode);
+  });
+  return s;
+}
+function deriv(ts){ return ts.filter(t=>t.e>=1).map(t=>({c:rmul(t.c,R(t.e)),e:t.e-1})).filter(t=>t.c.n!==0); }
+function evalAt(ts,x0){ let s=R(0); ts.forEach(t=>{ let p=R(1); for(let i=0;i<t.e;i++) p=rmul(p,R(x0)); s=radd(s,rmul(t.c,p)); }); return s; }
+function numStr(r){ return (r.n<0?MINUS:'')+Math.abs(r.n)+(r.d!==1?('/'+r.d):''); }
+
+function cloneTs(ts){ return ts.map(t=>({c:{n:t.c.n,d:t.c.d},e:t.e})); }
+function pick(a){ return a[Math.floor(Math.random()*a.length)]; }
+
+function uniqueExp(ts){ const s=new Set(); for(const t of ts){ if(t.c.n===0) continue; if(s.has(t.e)) return false; s.add(t.e); } return true; }
+
+function wrongPolys(F,D,mode){
+  const c=[];
+  const P=ts=>{ if(uniqueExp(ts)) c.push(polyStr(ts,mode)); };
+  const FF=F.filter(t=>t.e>=1);
+  // 1) Exponent nicht verringert
+  P(FF.map(t=>({c:rmul(t.c,R(t.e)),e:t.e})));
+  // 2) Faktor nicht mit Exponent multipliziert
+  P(FF.map(t=>({c:t.c,e:t.e-1})));
+  // 3) Konstante bleibt stehen
+  const k=F.filter(t=>t.e===0);
+  if(k.length) P(D.concat(k));
+  // 4) Vorzeichenfehler bei einem Summanden
+  if(D.length){ const X=cloneTs(D); const t=pick(X); t.c=rneg(t.c); P(X); }
+  // 5) nur der erste Summand wurde abgeleitet
+  if(F.length>=2){ const sorted=F.slice().sort((a,b)=>b.e-a.e); P(deriv([sorted[0]]).concat(sorted.slice(1))); }
+  // 6) Exponent doppelt verringert
+  if(D.length){ const X=cloneTs(D); const t=X[0]; if(t.e>=1){ t.e-=1; P(X); } }
+  return c;
+}
+
+function makeDistractors(F,D,mode,correct){
+  let seen=new Set([correct]); let out=[];
+  const add=s=>{ if(s && !seen.has(s)){ seen.add(s); out.push(s); } };
+  if(D.length===0){
+    const k=F[0]; add(polyStr(F,mode)); add('1'); add(fmtNum(R(Math.abs(k.c.n),k.c.d),mode)+'x'); add(MINUS+polyStr(F,mode));
+  } else {
+    shuffle(wrongPolys(F,D,mode)).forEach(add);
+  }
+  let tries=0;
+  while(out.length<3 && tries<80){
+    tries++;
+    const X=cloneTs(D.length?D:F); const t=pick(X);
+    if(Math.random()<0.5) t.c=radd(t.c,R(Math.random()<0.5?1:-1)); else t.e=Math.max(0,t.e+(Math.random()<0.5?1:-1));
+    if(uniqueExp(X)) add(polyStr(X,mode));
+  }
+  return shuffle(out).slice(0,3);
+}
+
+function explainTerms(F,mode){
+  return F.slice().sort((a,b)=>b.e-a.e).map(t=>{
+    const d=deriv([t]); return '('+(t.c.n<0?MINUS:'')+termBody(t,mode)+')′ = '+polyStr(d,mode);
+  }).join(', ');
+}
+
+function buildQ(def){
+  const mode=def.mode||'dec';
+  const F=def.t;
+  const ds=def.disp ? def.disp : polyStr(F,mode);
+  if(def.x0!==undefined){
+    const D=deriv(F), ans=evalAt(D,def.x0), fx=evalAt(F,def.x0);
+    const ansS=numStr(ans);
+    const cand=[numStr(fx),numStr(rneg(ans)),numStr(evalAt(F.filter(t=>t.e>=1).map(t=>({c:rmul(t.c,R(t.e)),e:t.e})),def.x0)),numStr(evalAt(F.filter(t=>t.e>=1).map(t=>({c:t.c,e:t.e-1})),def.x0))];
+    const seen=new Set([ansS]); const out=[];
+    shuffle(cand).forEach(s=>{ if(!seen.has(s)){seen.add(s);out.push(s);} });
+    let k=1; while(out.length<3){ [ -k, k, 2*k, -2*k ].forEach(v=>{ const s=numStr(radd(ans,R(v))); if(out.length<3&&!seen.has(s)){seen.add(s);out.push(s);} }); k++; }
+    const x0s=(def.x0<0?MINUS:'')+Math.abs(def.x0);
+    return {lv:def.lv,
+      q:'Bestimmen Sie die Steigung des Graphen von f mit f(x) = '+ds+' an der Stelle x<sub>0</sub> = '+x0s+'.',
+      o:[ansS].concat(shuffle(out).slice(0,3)),c:0,
+      e:'f′(x) = '+polyStr(D,mode)+'. Einsetzen: f′('+x0s+') = '+ansS+'. (Setzt man x<sub>0</sub> in f ein, erhält man den y-Wert '+numStr(fx)+', nicht die Steigung.)'};
+  }
+  const D=deriv(F);
+  const correct=polyStr(D,mode);
+  const wrong=makeDistractors(F,D,mode,correct);
+  const pre=def.disp?('Ausmultipliziert: f(x) = '+polyStr(F,mode)+'. '):'';
+  return {lv:def.lv,
+    q:'Leiten Sie ab: f(x) = '+ds,
+    o:['f′(x) = '+correct].concat(wrong.map(w=>'f′(x) = '+w)),c:0,
+    e:pre+'Term für Term: '+explainTerms(F,mode)+'. Ergebnis: f′(x) = '+correct+'.'};
+}
+
+const FR=(n,d)=>'<span class="fr"><span>'+n+'</span><span>'+d+'</span></span>';
+const DEFS=[
+ // Stufe 1: Potenzregel
+ {lv:0,t:[T(1,3)]},{lv:0,t:[T(1,5)]},{lv:0,t:[T(1,2)]},{lv:0,t:[T(1,6)]},
+ // Stufe 2: Faktor
+ {lv:1,t:[T(4,3)]},{lv:1,t:[T(5,5)]},{lv:1,t:[T(3,4)]},{lv:1,t:[T(7,2)]},{lv:1,t:[T(10,3)]},
+ // Stufe 3: x allein, Konstanten
+ {lv:2,t:[T(6,1)]},{lv:2,t:[T(-4,1)]},{lv:2,t:[T(12,0)]},{lv:2,t:[T(1,2),T(7,0)]},
+ // Stufe 4: Summen
+ {lv:3,t:[T(1,3),T(1,2)]},{lv:3,t:[T(2,4),T(3,2)]},{lv:3,t:[T(1,5),T(4,1),T(9,0)]},{lv:3,t:[T(3,3),T(2,2),T(5,1)]},{lv:3,t:[T(6,2),T(3,1),T(1,0)]},
+ // Stufe 5: Vorzeichen
+ {lv:4,t:[T(-1,3)]},{lv:4,t:[T(1,4),T(-5,2)]},{lv:4,t:[T(-1,2),T(4,0)]},{lv:4,t:[T(3,2),T(-5,1),T(7,0)]},{lv:4,t:[T(-2,5),T(1,3),T(-8,1)]},{lv:4,t:[T(-1,4),T(-3,2),T(2,0)]},
+ // Stufe 6: Dezimalzahlen und Brüche
+ {lv:5,mode:'dec',t:[T(1,4,2)]},
+ {lv:5,mode:'dec',t:[T(1,5,5),T(-3,2)]},
+ {lv:5,mode:'dec',t:[T(1,4,4),T(-3,2,2),T(1,1)]},
+ {lv:5,mode:'frac',t:[T(1,3,3),T(-1,2)]},
+ {lv:5,mode:'frac',t:[T(1,4,2),T(-3,2),T(5,0)]},
+ {lv:5,mode:'frac',t:[T(1,3,6),T(-3,2,2),T(1,1),T(-7,0)]},
+ // Stufe 7: ausmultiplizieren
+ {lv:6,disp:'(x '+MINUS+' 3)<sup>2</sup>',t:[T(1,2),T(-6,1),T(9,0)]},
+ {lv:6,disp:'x(x + 4)',t:[T(1,2),T(4,1)]},
+ {lv:6,disp:'(x + 2)(x '+MINUS+' 5)',t:[T(1,2),T(-3,1),T(-10,0)]},
+ {lv:6,disp:'2x(x<sup>2</sup> '+MINUS+' 1)',t:[T(2,3),T(-2,1)]},
+ {lv:6,mode:'frac',disp:FR(1,4)+'(x '+MINUS+' 3)(x + 1)',t:[T(1,2,4),T(-1,1,2),T(-3,0,4)]},
+ // Stufe 8: Steigung an einer Stelle
+ {lv:7,t:[T(1,2)],x0:-3},
+ {lv:7,t:[T(3,2),T(2,1)],x0:2},
+ {lv:7,t:[T(1,3),T(-9,2),T(15,1),T(25,0)],x0:2},
+ {lv:7,t:[T(3,4),T(2,3)],x0:2},
+ {lv:7,t:[T(-1,4),T(2,2)],x0:1}
+];
+const QUESTIONS = DEFS.map(buildQ);
+
+
+const $ = id => document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let order, idx, score, mode, wrong, queue, stats;
+
+function cur(){ return mode==='main' ? QUESTIONS[order[idx]] : queue[0]; }
+
+function start(){
+  mode='main'; score=0; wrong=[]; stats=CFG.levels.map(()=>({r:0,t:0})); idx=0; queue=[];
+  order=[];
+  CFG.levels.forEach((L,li)=>{
+    const ids=QUESTIONS.map((q,i)=>i).filter(i=>QUESTIONS[i].lv===li);
+    order.push(...(CFG.shuffleWithin?shuffle(ids):ids));
+  });
+  $('start').classList.add('hide'); $('end').classList.add('hide'); $('quiz').classList.remove('hide');
+  show();
+}
+
+function show(){
+  const q=cur();
+  if(mode==='main'){
+    $('count').textContent='Frage '+(idx+1)+' von '+order.length;
+    $('prog').style.width=(idx/order.length*100)+'%';
+  } else {
+    $('count').textContent='Übungsrunde: noch '+queue.length+' Frage'+(queue.length===1?'':'n');
+    $('prog').style.width='100%';
+  }
+  $('pts').textContent='Richtig: '+score;
+  const L=CFG.levels[q.lv];
+  $('lvl').textContent=CFG.levelWord+' '+(q.lv+1)+' von '+CFG.levels.length+' · '+L.name;
+  $('tip').innerHTML=L.tip; $('tip').classList.toggle('hide',!L.tip);
+  $('qtext').innerHTML=q.q;
+  $('gbox').innerHTML=q.svg?q.svg:''; $('gbox').classList.toggle('hide',!q.svg);
+  $('fb').classList.add('hide'); $('next').classList.add('hide');
+  const opts=shuffle(q.o.map((t,i)=>({t,ok:i===q.c})));
+  const box=$('opts'); box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.innerHTML=o.t; b.dataset.ok=o.ok?'1':'0';
+    b.onclick=()=>answer(b,o.ok,q,box);
+    box.appendChild(b);
+  });
+}
+
+function answer(btn,ok,q,box){
+  [...box.children].forEach(b=>b.disabled=true);
+  if(ok) btn.classList.add('ok'); else btn.classList.add('bad');
+  [...box.children].forEach(b=>{ if(b.dataset.ok==='1') b.classList.add('ok'); });
+  if(mode==='main'){
+    stats[q.lv].t++;
+    if(ok){ score++; stats[q.lv].r++; } else { wrong.push(q); }
+    $('pts').textContent='Richtig: '+score;
+  } else {
+    if(ok) queue.shift(); else queue.push(queue.shift());
+  }
+  const fb=$('fb');
+  fb.className='fb '+(ok?'ok':'bad');
+  fb.innerHTML='<strong>'+(ok?'Richtig!':'Leider falsch.')+'</strong> '+q.e;
+  const nx=$('next');
+  const last = mode==='main' ? idx===order.length-1 : queue.length===0;
+  nx.textContent = last ? (mode==='main'?'Ergebnis anzeigen':'Fertig') : 'Weiter';
+  nx.classList.remove('hide');
+}
+
+$('next').onclick=()=>{
+  if(mode==='main'){ idx++; if(idx<order.length) show(); else finish(''); }
+  else { if(queue.length) show(); else finish('Alle Fehler geübt ✓'); }
+};
+
+function pad(n){return String(n).padStart(2,'0');}
+
+function finish(note){
+  $('quiz').classList.add('hide'); $('end').classList.remove('hide');
+  const n=QUESTIONS.length, d=new Date();
+  $('final').textContent=score+' von '+n+' richtig';
+  const ratio=score/n;
+  $('verdict').textContent = ratio>=0.9 ? CFG.verdict[0] : ratio>=0.7 ? CFG.verdict[1] : CFG.verdict[2];
+  $('ptitle').textContent=CFG.title;
+  $('ptotal').textContent=score+' von '+n+' richtig';
+  $('pdate').textContent=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+', '+pad(d.getHours())+':'+pad(d.getMinutes())+' Uhr';
+  $('plevels').innerHTML=CFG.levels.map((L,i)=>'<tr><td>'+CFG.levelWord+' '+(i+1)+': '+L.name+'</td><td>'+stats[i].r+' / '+stats[i].t+'</td></tr>').join('');
+  $('note').textContent=note;
+  const p=$('practice');
+  if(wrong.length && !note){ p.textContent='Fehler nochmal üben ('+wrong.length+')'; p.classList.remove('hide'); }
+  else p.classList.add('hide');
+}
+
+$('go').onclick=start;
+$('again').onclick=start;
+$('practice').onclick=()=>{
+  mode='practice'; queue=wrong.slice();
+  $('end').classList.add('hide'); $('quiz').classList.remove('hide'); show();
+};
+
+</script>
+</body>
+</html>

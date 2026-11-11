@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 1 Verständnis</title>
+<style>
+  :root{--bg:#f4f7fb;--card:#fff;--ink:#1d2433;--muted:#5b6578;--accent:#2563eb;--ok:#15803d;--okbg:#e7f6ec;--bad:#b91c1c;--badbg:#fdecec;--line:#d9e0ec;--warn:#fff7e0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  h1{font-size:1.5rem;margin:8px 0 4px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:0;padding:12px 18px;background:var(--accent);color:#fff;font-weight:600}
+  button.sec{background:#e8eefc;color:var(--accent)}
+  .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+  .bar>div{height:100%;background:var(--accent);width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem}
+  .lvl{font-weight:700;color:var(--accent);margin:4px 0 2px}
+  .tip{background:var(--warn);border-radius:10px;padding:8px 12px;font-size:.92rem;margin:6px 0 12px}
+  .q{font-size:1.2rem;font-weight:600;margin:6px 0 14px}
+  .gbox{text-align:center;margin:0 0 12px}
+  .gbox svg{width:100%;max-width:420px;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .opt{display:block;width:100%;text-align:left;background:#fff;color:var(--ink);border:2px solid var(--line);margin-bottom:10px;padding:12px 14px;font-weight:500}
+  .opt:hover:not(:disabled){border-color:var(--accent)}
+  .opt.ok{background:var(--okbg);border-color:var(--ok)}
+  .opt.bad{background:var(--badbg);border-color:var(--bad)}
+  .opt:disabled{opacity:1;cursor:default}
+  .fb{margin-top:6px;padding:12px 14px;border-radius:10px}
+  .fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)}
+  .hide{display:none}
+  .score{font-size:2.2rem;font-weight:800;margin:0}
+  .small{font-size:.9rem;color:var(--muted)}
+  .proof{border:2px dashed var(--accent);border-radius:12px;padding:14px;background:#f0f4ff;margin:10px 0}
+  .proof table{border-collapse:collapse;width:100%;margin-top:6px}
+  .proof td{padding:3px 0;border-bottom:1px solid #d6def0;font-size:.95rem}
+  .proof td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+  sup,sub{line-height:0}
+  .fr{display:inline-flex;flex-direction:column;vertical-align:middle;text-align:center;font-size:.85em;line-height:1.15;margin:0 2px}
+  .fr>span:first-child{border-bottom:1px solid currentColor;padding:0 3px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Quiz 1: Die Ableitungsfunktion verstehen</h1>
+  <p class="sub">M BOS 12 · Selbstkontrolle · Notation, Intervalle, Graph · Sie erhalten nach jeder Antwort sofort eine Rückmeldung.</p>
+
+  <div id="start" class="card">
+    <p style="margin-top:0"><strong>So geht's:</strong> Halten Sie Ihr Notizblatt mit den Notizen aus Video 1 bereit. Nach jeder Antwort sehen Sie sofort, ob sie stimmt, und bekommen eine Erklärung. Am Ende zeigt eine Ergebnisseite Ihre Punktzahl: Machen Sie davon einen Screenshot oder ein Foto und geben Sie es in Teams ab.</p>
+    <p class="small">Es werden keine Daten gespeichert oder versendet.</p>
+    <button id="go">Quiz starten</button>
+  </div>
+
+  <div id="quiz" class="card hide">
+    <div class="meta"><span id="count"></span><span id="pts"></span></div>
+    <div class="bar"><div id="prog"></div></div>
+    <div class="lvl" id="lvl"></div>
+    <div class="tip" id="tip"></div>
+    <div id="qtext" class="q"></div>
+    <div id="gbox" class="gbox hide"></div>
+    <div id="opts"></div>
+    <div id="fb" class="fb hide"></div>
+    <p><button id="next" class="hide">Weiter</button></p>
+  </div>
+
+  <div id="end" class="card hide">
+    <p class="score" id="final"></p>
+    <p id="verdict"></p>
+    <div class="proof">
+      <strong>Ihr Ergebnis (Screenshot oder Foto für Teams)</strong>
+      <table>
+        <tr><td id="ptitle"></td><td id="ptotal"></td></tr>
+        <tr><td>Datum</td><td id="pdate"></td></tr>
+      </table>
+      <table id="plevels"></table>
+    </div>
+    <p id="note" style="font-weight:700;color:#15803d"></p>
+    <p><button id="practice" class="hide">Fehler nochmal üben</button></p>
+    <p class="small">Tipp: Notieren Sie auf Ihrem Notizblatt, bei welchen Aufgaben Sie Fehler gemacht haben und warum. Danach können Sie das Quiz erneut starten.</p>
+    <p><button class="sec" id="again">Quiz neu starten</button></p>
+  </div>
+</div>
+<script>
+
+const CFG = {
+  title:'Quiz 1: Verständnis Ableitungsfunktion',
+  levelWord:'Block', shuffleWithin:false,
+  levels:[
+    {name:'Notation und Bedeutung', tip:''},
+    {name:'Intervallschreibweise', tip:'<strong>Merkhilfe:</strong> [a; b] enthält die Randwerte, ]a; b[ enthält sie nicht. Bei ∞ steht immer eine nach außen offene Klammer, z. B. ]2; ∞[.'},
+    {name:'Am Graphen ablesen', tip:'Der Graph von f hat einen <strong>Hochpunkt</strong> und einen <strong>Tiefpunkt</strong>. Lesen Sie die Stellen am Gitternetz ab. Randpunkte der Intervalle (Hoch- und Tiefpunkt) gehören dazu.'}
+  ],
+  verdict:['Sehr gut! Sie haben die Grundidee der Ableitungsfunktion verstanden.','Gut! Schauen Sie sich die Aufgaben mit Fehlern noch einmal an und sehen Sie ggf. das Video erneut.','Noch Luft nach oben: Sehen Sie Video 1 noch einmal mit Ihren Fokusfragen an und starten Sie das Quiz danach erneut.']
+};
+
+function graphSVG(){
+  const W=400,H=330,sx=40,sy=26,ox=200,oy=165;
+  const f=x=>x*x*x/4-3*x;
+  let g='';
+  for(let i=-5;i<=5;i++){ g+='<line x1="'+(ox+i*sx)+'" y1="0" x2="'+(ox+i*sx)+'" y2="'+H+'" stroke="#e1e7f0" stroke-width="1"/>'; }
+  for(let j=-6;j<=6;j++){ g+='<line x1="0" y1="'+(oy-j*sy)+'" x2="'+W+'" y2="'+(oy-j*sy)+'" stroke="#e1e7f0" stroke-width="1"/>'; }
+  g+='<line x1="0" y1="'+oy+'" x2="'+W+'" y2="'+oy+'" stroke="#1d2433" stroke-width="1.6"/>';
+  g+='<line x1="'+ox+'" y1="0" x2="'+ox+'" y2="'+H+'" stroke="#1d2433" stroke-width="1.6"/>';
+  g+='<text x="'+(W-12)+'" y="'+(oy-6)+'" font-size="13" fill="#1d2433">x</text><text x="'+(ox+6)+'" y="12" font-size="13" fill="#1d2433">y</text>';
+  for(let i=-4;i<=4;i++){ if(i!==0) g+='<text x="'+(ox+i*sx)+'" y="'+(oy+14)+'" font-size="11" text-anchor="middle" fill="#5b6578">'+(i<0?'−'+(-i):i)+'</text>'; }
+  for(let j=-6;j<=6;j++){ if(j!==0 && j%2===0) g+='<text x="'+(ox-5)+'" y="'+(oy-j*sy+4)+'" font-size="11" text-anchor="end" fill="#5b6578">'+(j<0?'−'+(-j):j)+'</text>'; }
+  let d='';
+  for(let x=-5;x<=5.0001;x+=0.05){ const y=f(x); if(Math.abs(y)<=6.2){ d+=(d?'L':'M')+(ox+x*sx).toFixed(1)+' '+(oy-y*sy).toFixed(1)+' '; } }
+  g+='<path d="'+d+'" fill="none" stroke="#2563eb" stroke-width="2.6"/>';
+  g+='<text x="'+(ox+2.7*sx)+'" y="'+(oy-3.6*sy)+'" font-size="16" fill="#2563eb" font-weight="700">G<tspan dy="4" font-size="12">f</tspan></text>';
+  return '<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Graph von f">'+g+'</svg>';
+}
+const GR = graphSVG();
+
+const QUESTIONS = [
+ // Block 1
+ {lv:0,q:'Wie wird die Ableitungsfunktion einer Funktion <i>f</i> notiert?',
+  o:['f′(x)','f(x)′′′','F(x)','f⁻¹(x)'],c:0,
+  e:'Die Ableitungsfunktion heißt f′ (gesprochen „f Strich“). Ihr Term wird als f′(x) geschrieben.'},
+ {lv:0,q:'Was gibt der Funktionswert f′(x<sub>0</sub>) an?',
+  o:['Die Steigung des Graphen von f an der Stelle x<sub>0</sub>','Den y-Wert des Graphen an der Stelle x<sub>0</sub>','Die Nullstelle von f','Den Abstand des Graphen zur x-Achse'],c:0,
+  e:'f′(x<sub>0</sub>) ist die Steigung der Tangente an den Graphen von f in der Stelle x<sub>0</sub>, also die Steigung des Graphen dort. Den y-Wert liefert f(x<sub>0</sub>).'},
+ {lv:0,q:'Es gilt f(2) = 1 und f′(2) = 3. Was bedeutet das?',
+  o:['Der Graph geht durch den Punkt (2 | 1) und hat dort die Steigung 3.','Der Graph geht durch den Punkt (2 | 3) und hat dort die Steigung 1.','Der Graph hat bei x = 1 die Steigung 3.','Der Graph hat die Nullstelle x = 2.'],c:0,
+  e:'f(2) = 1 ist der y-Wert: Punkt (2 | 1). f′(2) = 3 ist die Steigung an dieser Stelle.'},
+ {lv:0,q:'Es gilt f′(3) = 0. Was bedeutet das für den Graphen von f an der Stelle x = 3?',
+  o:['Die Tangente ist waagrecht (dort kann ein Hoch- oder Tiefpunkt liegen).','Der Graph hat dort eine Nullstelle.','Der Graph steigt dort am stärksten.','Der Graph verläuft dort senkrecht.'],c:0,
+  e:'Steigung 0 bedeutet waagrechte Tangente. Das ist die Vorbereitung auf Extremstellen. Ob wirklich ein Extrempunkt vorliegt, muss man noch prüfen.'},
+ {lv:0,q:'An einer Stelle x<sub>1</sub> gilt f′(x<sub>1</sub>) &lt; 0. Was bedeutet das?',
+  o:['Der Graph von f fällt dort.','Der Graph von f steigt dort.','Der Graph von f hat dort einen Tiefpunkt.','Der Funktionswert f(x<sub>1</sub>) ist negativ.'],c:0,
+  e:'Negative Steigung heißt: Der Graph fällt. Eine negative Ableitung sagt nichts darüber, ob f(x<sub>1</sub>) selbst negativ ist.'},
+ {lv:0,q:'Vervollständigen Sie: Die Ableitungsfunktion f′ ordnet jeder Stelle x<sub>0</sub> …',
+  o:['die Steigung des Graphen von f an dieser Stelle zu.','den Funktionswert von f an dieser Stelle zu.','die nächste Nullstelle von f zu.','den Hochpunkt von f zu.'],c:0,
+  e:'Merksatz: Die Ableitungsfunktion f′ ordnet jeder Stelle x<sub>0</sub> die Steigung des Graphen von f an dieser Stelle zu.'},
+ // Block 2
+ {lv:1,q:'Welche Schreibweise bedeutet: alle x mit −2 ≤ x ≤ 2 (Randwerte gehören dazu)?',
+  o:['[−2; 2]',']−2; 2[','[−2; 2[','[2; −2]'],c:0,
+  e:'Eckige Klammern nach innen ([ ]) bedeuten: Die Randwerte gehören dazu. Die kleinere Zahl steht links.'},
+ {lv:1,q:'Welche Schreibweise bedeutet: alle x mit x &gt; 2?',
+  o:[']2; ∞[','[2; ∞[',']2; ∞]',']−∞; 2['],c:0,
+  e:'x &gt; 2 enthält die 2 nicht, also eine nach außen offene Klammer bei 2. Unendlich ist keine Zahl, deshalb steht bei ∞ immer eine offene Klammer.'},
+ {lv:1,q:'Welche Schreibweise bedeutet: alle x mit x ≤ −1?',
+  o:[']−∞; −1]',']−∞; −1[','[−1; ∞[','[−∞; −1]'],c:0,
+  e:'x ≤ −1 enthält die −1, also eckige Klammer bei −1. Bei −∞ steht eine offene Klammer.'},
+ // Block 3 (Graph)
+ {lv:2,svg:GR,q:'In welchem Intervall <strong>fällt</strong> der Graph von f?',
+  o:['[−2; 2]','[−4; −2]','[0; 4]','[2; 4]'],c:0,
+  e:'Vom Hochpunkt bei x = −2 bis zum Tiefpunkt bei x = 2 geht der Graph nach unten. Dort ist f′(x) &lt; 0.'},
+ {lv:2,svg:GR,q:'In welchen Intervallen <strong>steigt</strong> der Graph von f?',
+  o:[']−∞; −2] und [2; ∞[','[−2; 2]','[0; ∞[',']−∞; 0]'],c:0,
+  e:'Links vom Hochpunkt (bis x = −2) und rechts vom Tiefpunkt (ab x = 2) steigt der Graph. Dort ist f′(x) &gt; 0.'},
+ {lv:2,svg:GR,q:'An welchen Stellen ist f′(x) = 0, also die Tangente waagrecht?',
+  o:['x = −2 und x = 2','x = 0','x = −4 und x = 4','x = −3,5 und x = 3,5'],c:0,
+  e:'Waagrechte Tangenten gibt es am Hochpunkt (x = −2) und am Tiefpunkt (x = 2). Die Stellen bei etwa ±3,5 sind Nullstellen von f, nicht von f′.'},
+ {lv:2,svg:GR,q:'Welches Vorzeichen hat f′(3)?',
+  o:['positiv','negativ','null','Das lässt sich nicht sagen.'],c:0,
+  e:'Bei x = 3 steigt der Graph (rechts vom Tiefpunkt). Steigung positiv, also f′(3) &gt; 0.'},
+ {lv:2,svg:GR,q:'Welches Vorzeichen hat f′(0)?',
+  o:['negativ','positiv','null','Das lässt sich nicht sagen.'],c:0,
+  e:'Bei x = 0 fällt der Graph (zwischen Hoch- und Tiefpunkt). Steigung negativ, also f′(0) &lt; 0.'}
+];
+
+
+const $ = id => document.getElementById(id);
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+let order, idx, score, mode, wrong, queue, stats;
+
+function cur(){ return mode==='main' ? QUESTIONS[order[idx]] : queue[0]; }
+
+function start(){
+  mode='main'; score=0; wrong=[]; stats=CFG.levels.map(()=>({r:0,t:0})); idx=0; queue=[];
+  order=[];
+  CFG.levels.forEach((L,li)=>{
+    const ids=QUESTIONS.map((q,i)=>i).filter(i=>QUESTIONS[i].lv===li);
+    order.push(...(CFG.shuffleWithin?shuffle(ids):ids));
+  });
+  $('start').classList.add('hide'); $('end').classList.add('hide'); $('quiz').classList.remove('hide');
+  show();
+}
+
+function show(){
+  const q=cur();
+  if(mode==='main'){
+    $('count').textContent='Frage '+(idx+1)+' von '+order.length;
+    $('prog').style.width=(idx/order.length*100)+'%';
+  } else {
+    $('count').textContent='Übungsrunde: noch '+queue.length+' Frage'+(queue.length===1?'':'n');
+    $('prog').style.width='100%';
+  }
+  $('pts').textContent='Richtig: '+score;
+  const L=CFG.levels[q.lv];
+  $('lvl').textContent=CFG.levelWord+' '+(q.lv+1)+' von '+CFG.levels.length+' · '+L.name;
+  $('tip').innerHTML=L.tip; $('tip').classList.toggle('hide',!L.tip);
+  $('qtext').innerHTML=q.q;
+  $('gbox').innerHTML=q.svg?q.svg:''; $('gbox').classList.toggle('hide',!q.svg);
+  $('fb').classList.add('hide'); $('next').classList.add('hide');
+  const opts=shuffle(q.o.map((t,i)=>({t,ok:i===q.c})));
+  const box=$('opts'); box.innerHTML='';
+  opts.forEach(o=>{
+    const b=document.createElement('button');
+    b.className='opt'; b.innerHTML=o.t; b.dataset.ok=o.ok?'1':'0';
+    b.onclick=()=>answer(b,o.ok,q,box);
+    box.appendChild(b);
+  });
+}
+
+function answer(btn,ok,q,box){
+  [...box.children].forEach(b=>b.disabled=true);
+  if(ok) btn.classList.add('ok'); else btn.classList.add('bad');
+  [...box.children].forEach(b=>{ if(b.dataset.ok==='1') b.classList.add('ok'); });
+  if(mode==='main'){
+    stats[q.lv].t++;
+    if(ok){ score++; stats[q.lv].r++; } else { wrong.push(q); }
+    $('pts').textContent='Richtig: '+score;
+  } else {
+    if(ok) queue.shift(); else queue.push(queue.shift());
+  }
+  const fb=$('fb');
+  fb.className='fb '+(ok?'ok':'bad');
+  fb.innerHTML='<strong>'+(ok?'Richtig!':'Leider falsch.')+'</strong> '+q.e;
+  const nx=$('next');
+  const last = mode==='main' ? idx===order.length-1 : queue.length===0;
+  nx.textContent = last ? (mode==='main'?'Ergebnis anzeigen':'Fertig') : 'Weiter';
+  nx.classList.remove('hide');
+}
+
+$('next').onclick=()=>{
+  if(mode==='main'){ idx++; if(idx<order.length) show(); else finish(''); }
+  else { if(queue.length) show(); else finish('Alle Fehler geübt ✓'); }
+};
+
+function pad(n){return String(n).padStart(2,'0');}
+
+function finish(note){
+  $('quiz').classList.add('hide'); $('end').classList.remove('hide');
+  const n=QUESTIONS.length, d=new Date();
+  $('final').textContent=score+' von '+n+' richtig';
+  const ratio=score/n;
+  $('verdict').textContent = ratio>=0.9 ? CFG.verdict[0] : ratio>=0.7 ? CFG.verdict[1] : CFG.verdict[2];
+  $('ptitle').textContent=CFG.title;
+  $('ptotal').textContent=score+' von '+n+' richtig';
+  $('pdate').textContent=pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear()+', '+pad(d.getHours())+':'+pad(d.getMinutes())+' Uhr';
+  $('plevels').innerHTML=CFG.levels.map((L,i)=>'<tr><td>'+CFG.levelWord+' '+(i+1)+': '+L.name+'</td><td>'+stats[i].r+' / '+stats[i].t+'</td></tr>').join('');
+  $('note').textContent=note;
+  const p=$('practice');
+  if(wrong.length && !note){ p.textContent='Fehler nochmal üben ('+wrong.length+')'; p.classList.remove('hide'); }
+  else p.classList.add('hide');
+}
+
+$('go').onclick=start;
+$('again').onclick=start;
+$('practice').onclick=()=>{
+  mode='practice'; queue=wrong.slice();
+  $('end').classList.add('hide'); $('quiz').classList.remove('hide'); show();
+};
+
+</script>
+</body>
+</html>
