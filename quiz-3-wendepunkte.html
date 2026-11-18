@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quiz 3 Wendepunkte am Graphen</title>
+<style>
+  :root{--bg:#f4f7fb;--card:#fff;--ink:#1d2433;--muted:#5b6578;--accent:#2563eb;--ok:#15803d;--okbg:#e7f6ec;--bad:#b91c1c;--badbg:#fdecec;--line:#d9e0ec;--warn:#fff7e0}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .wrap{max-width:720px;margin:0 auto;padding:16px}
+  h1{font-size:1.5rem;margin:8px 0 4px}
+  .sub{color:var(--muted);margin:0 0 16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:0;padding:12px 18px;background:var(--accent);color:#fff;font-weight:600}
+  button:disabled{background:#aab6cf;cursor:default}
+  button.sec{background:#e8eefc;color:var(--accent)}
+  .bar{height:8px;background:var(--line);border-radius:99px;overflow:hidden;margin:6px 0 14px}
+  .bar>div{height:100%;background:var(--accent);width:0;transition:width .3s}
+  .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:.9rem}
+  .tip{background:var(--warn);border-radius:10px;padding:8px 12px;font-size:.92rem;margin:6px 0 12px}
+  .q{font-size:1.15rem;font-weight:600;margin:6px 0 10px}
+  .gbox{text-align:center;margin:0 0 12px}
+  .gbox svg{width:100%;max-width:440px;height:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  .cnt{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+  .cnt button{background:#fff;color:var(--ink);border:2px solid var(--line);padding:10px 14px;font-weight:600}
+  .cnt button.sel{border-color:var(--accent);background:#e8eefc;color:var(--accent)}
+  .cnt button:disabled{opacity:1;cursor:default;background:#fff;color:var(--ink)}
+  .cnt button.sel:disabled{background:#e8eefc;color:var(--accent)}
+  .wrow{display:flex;align-items:center;gap:6px;margin:8px 0;font-size:1.15rem;flex-wrap:wrap}
+  .wrow input{width:4.6em;font:inherit;font-size:1.1rem;text-align:center;padding:8px 6px;border:2px solid var(--line);border-radius:8px}
+  .wrow input:focus{outline:none;border-color:var(--accent)}
+  .wrow input.ok{border-color:var(--ok);background:var(--okbg)}
+  .wrow input.bad{border-color:var(--bad);background:var(--badbg)}
+  .fb{margin-top:10px;padding:12px 14px;border-radius:10px}
+  .fb.ok{background:var(--okbg)} .fb.bad{background:var(--badbg)}
+  .hide{display:none}
+  .score{font-size:2.2rem;font-weight:800;margin:0}
+  .small{font-size:.9rem;color:var(--muted)}
+  .proof{border:2px dashed var(--accent);border-radius:12px;padding:14px;background:#f0f4ff;margin:10px 0}
+  .proof table{border-collapse:collapse;width:100%;margin-top:6px}
+  .proof td{padding:3px 0;border-bottom:1px solid #d6def0;font-size:.95rem}
+  .proof td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+  ol.steps{padding-left:1.2em;margin:8px 0}
+  ol.steps li{margin:4px 0}
+  .car{background:#f0f4ff;border-radius:12px;padding:12px 14px;margin:10px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Quiz 3: Wendepunkte am Graphen bestimmen</h1>
+  <p class="sub">M BOS 12 · Selbstkontrolle · Sie erhalten nach jeder Aufgabe sofort eine Rückmeldung.</p>
+
+  <div id="start" class="card">
+    <p style="margin-top:0"><strong>So finden Sie den Wendepunkt am Graphen:</strong></p>
+    <div class="car">
+      <p style="margin:0 0 6px"><strong>Die Auto-Methode:</strong> Setzen Sie sich in Gedanken <strong>links</strong> auf den Graphen in ein Auto und fahren Sie nach <strong>rechts</strong> die Kurve entlang. Achten Sie auf das <strong>Lenkrad</strong>:</p>
+      <ul style="margin:4px 0 0;padding-left:1.2em">
+        <li><strong>Linkskurve:</strong> Lenkrad nach links eingeschlagen (hier gilt f″ &gt; 0).</li>
+        <li><strong>Rechtskurve:</strong> Lenkrad nach rechts eingeschlagen (hier gilt f″ &lt; 0).</li>
+        <li><strong>Wendepunkt:</strong> Hier steht das Lenkrad <strong>kurz geradeaus</strong> und wird dann zur anderen Seite gedreht. Die Kurve wechselt von Links- zu Rechtskurve oder umgekehrt.</li>
+      </ul>
+    </div>
+    <p style="margin-bottom:4px"><strong>Vorgehen in jeder Aufgabe:</strong></p>
+    <ol class="steps">
+      <li>Fahren Sie den Graphen von links nach rechts ab und beobachten Sie das Lenkrad.</li>
+      <li>Entscheiden Sie: Gibt es keinen, einen oder zwei Wendepunkte? (Die Wendepunkte sind <strong>nicht</strong> markiert.)</li>
+      <li>Lesen Sie die Koordinaten am Gitternetz ab. Alle Wendepunkte liegen auf Kästchenkreuzen.</li>
+      <li>Tragen Sie sie als W(x | y) ein. Bei zwei Wendepunkten: W₁ ist der linke.</li>
+    </ol>
+    <p class="small">Es werden keine Daten gespeichert oder versendet. Am Ende zeigt eine Ergebnisseite Ihre Punkte. Das Quiz dient der Selbstkontrolle.</p>
+    <button id="go">Quiz starten</button>
+  </div>
+
+  <div id="quiz" class="card hide">
+    <div class="meta"><span id="count"></span><span id="pts"></span></div>
+    <div class="bar"><div id="prog"></div></div>
+    <div class="tip">Fahren Sie von links nach rechts: Wo wechselt das Lenkrad die Richtung?</div>
+    <div id="qtext" class="q">Wie viele Wendepunkte hat der Graph von f?</div>
+    <div id="gbox" class="gbox"></div>
+    <div class="cnt" id="cnt"></div>
+    <div id="inputs"></div>
+    <p><button id="check" disabled>Prüfen</button></p>
+    <div id="fb" class="fb hide"></div>
+    <p><button id="next" class="hide">Weiter</button></p>
+  </div>
+
+  <div id="end" class="card hide">
+    <p class="score" id="final"></p>
+    <p id="verdict"></p>
+    <div class="proof">
+      <strong>Ihr Ergebnis</strong>
+      <table>
+        <tr><td id="ptitle"></td><td id="ptotal"></td></tr>
+        <tr><td>Datum</td><td id="pdate"></td></tr>
+      </table>
+      <table id="plist"></table>
+    </div>
+    <p id="note" style="font-weight:700;color:#15803d"></p>
+    <p><button id="practice" class="hide">Fehler nochmal üben</button></p>
+    <p class="small">Tipp: Notieren Sie auf Ihrem Notizblatt, bei welchen Aufgaben Sie Fehler gemacht haben und warum. Danach können Sie das Quiz erneut starten.</p>
+    <p><button class="sec" id="again">Quiz neu starten</button></p>
+  </div>
+</div>
+<script>
+// Aufgaben: f = Funktionsterm, f2 = zweite Ableitung (nur für die Erklärung), wp = Wendepunkte (x|y), von links nach rechts
+const TASKS = [
+  {f:x=>Math.pow(x-1,3)/4-(x-1)+1, f2:x=>1.5*(x-1), wp:[[1,1]]},
+  {f:x=>-Math.pow(x+1,3)/4+(x+1)-2, f2:x=>-1.5*(x+1), wp:[[-1,-2]]},
+  {f:x=>-x*x/4+3, f2:x=>-0.5, wp:[]},
+  {f:x=>x*x*x*x/24-x*x+1/3, f2:x=>x*x/2-2, wp:[[-2,-3],[2,-3]]},
+  {f:x=>Math.pow(x+2,3)/6-1, f2:x=>(x+2), wp:[[-2,-1]], terrace:true},
+  {f:x=>Math.pow(x-1,4)/8-2, f2:x=>1.5*Math.pow(x-1,2), wp:[], quartic:true},
+  {f:x=>x*x*x*x/12-x*x*x/6-x*x+0.75*x-0.5, f2:x=>x*x-x-2, wp:[[-1,-2],[2,-3]]},
+  {f:x=>-x*x*x*x/24+x*x-1/3, f2:x=>-x*x/2+2, wp:[[-2,3],[2,3]]}
+];
+
+const NS='http://www.w3.org/2000/svg';
+function minus(n){return n<0?'−'+(-n):''+n;}
+function graph(f){
+  const S=40,O=200,N=5;let g='';
+  for(let i=-N;i<=N;i++){
+    g+='<line x1="'+(O+i*S)+'" y1="0" x2="'+(O+i*S)+'" y2="400" stroke="#e1e7f0"/>';
+    g+='<line x1="0" y1="'+(O+i*S)+'" x2="400" y2="'+(O+i*S)+'" stroke="#e1e7f0"/>';
+  }
+  g+='<line x1="0" y1="'+O+'" x2="400" y2="'+O+'" stroke="#1d2433" stroke-width="1.6"/><line x1="'+O+'" y1="0" x2="'+O+'" y2="400" stroke="#1d2433" stroke-width="1.6"/>';
+  g+='<text x="388" y="'+(O-6)+'" font-size="13">x</text><text x="'+(O+6)+'" y="12" font-size="13">y</text>';
+  for(let i=-4;i<=4;i++){ if(i!==0){
+    g+='<text x="'+(O+i*S)+'" y="'+(O+14)+'" font-size="11" text-anchor="middle" fill="#5b6578">'+minus(i)+'</text>';
+    g+='<text x="'+(O-4)+'" y="'+(O-i*S+4)+'" font-size="11" text-anchor="end" fill="#5b6578">'+minus(i)+'</text>'; } }
+  let d='',pen=false;
+  for(let x=-5;x<=5.0001;x+=0.02){
+    const y=f(x);
+    if(Math.abs(y)<=5){ d+=(pen?'L':'M')+(O+x*S).toFixed(1)+' '+(O-y*S).toFixed(1)+' '; pen=true; } else pen=false;
+  }
+  g+='<path d="'+d+'" fill="none" stroke="#2563eb" stroke-width="2.8"/>';
+  return '<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Graph von f">'+g+'</svg>';
+}
+function curvText(t){
+  // Folge der Krümmung von links nach rechts
+  const xs=t.wp.map(p=>p[0]); const cuts=[-5].concat(xs).concat([5]);
+  const parts=[];
+  for(let i=0;i<cuts.length-1;i++){
+    const m=(cuts[i]+cuts[i+1])/2;
+    parts.push(t.f2(m)>0?'Linkskurve':'Rechtskurve');
+  }
+  return parts;
+}
+function explain(t){
+  const parts=curvText(t);
+  if(t.wp.length===0){
+    return 'Der Graph ist durchgehend eine '+parts[0]+'. Das Lenkrad bleibt immer auf derselben Seite und wechselt nie die Richtung. Es gibt <strong>keinen Wendepunkt</strong>.'+(t.quartic?' (Auch wenn die Kurve flach wirkt: Entscheidend ist der Wechsel der Kurvenrichtung.)':'');
+  }
+  let s='Von links: '+parts.map((p,i)=>(i?'dann ':'')+p).join(', ')+'. ';
+  s+='Wendepunkt'+(t.wp.length>1?'e':'')+': '+t.wp.map((p,i)=>(t.wp.length>1?'W'+'₁₂'[i]:'W')+'('+minus(p[0])+' | '+minus(p[1])+')').join(' und ')+'.';
+  if(t.terrace) s+=' Hier ist die Tangente zusätzlich waagrecht (Terrassenpunkt).';
+  return s;
+}
+
+let state;
+const $=id=>document.getElementById(id);
+function parse(v){
+  v=(v||'').trim().replace(/−/g,'-').replace(',','.');
+  if(v===''||!/^-?\d+(\.\d+)?$/.test(v)) return NaN;
+  return parseFloat(v);
+}
+function start(list){
+  state={list:list,i:0,pts:0,res:[],wrong:[],chosen:null,answered:false};
+  $('start').classList.add('hide');$('end').classList.add('hide');$('quiz').classList.remove('hide');
+  show();
+}
+function show(){
+  const idx=state.list[state.i],t=TASKS[idx];
+  state.chosen=null;state.answered=false;
+  $('count').textContent='Aufgabe '+(state.i+1)+' von '+state.list.length;
+  $('pts').textContent='Punkte: '+state.pts;
+  $('prog').style.width=(state.i/state.list.length*100)+'%';
+  $('gbox').innerHTML=graph(t.f);
+  $('inputs').innerHTML='';$('fb').classList.add('hide');$('next').classList.add('hide');
+  $('check').classList.remove('hide');$('check').disabled=true;
+  const c=$('cnt');c.innerHTML='';
+  [0,1,2].forEach(n=>{
+    const b=document.createElement('button');
+    b.textContent=n===0?'Kein Wendepunkt':(n===1?'1 Wendepunkt':'2 Wendepunkte');
+    b.onclick=()=>choose(n);c.appendChild(b);
+  });
+}
+function choose(n){
+  if(state.answered) return;
+  state.chosen=n;
+  [...$('cnt').children].forEach((b,i)=>b.classList.toggle('sel',i===n));
+  let h='';
+  for(let k=0;k<n;k++){
+    const lab=n===1?'W':'W'+'₁₂'[k];
+    h+='<div class="wrow"><span>'+lab+'(</span><input id="x'+k+'" inputmode="decimal" autocomplete="off" aria-label="x-Koordinate"><span>|</span><input id="y'+k+'" inputmode="decimal" autocomplete="off" aria-label="y-Koordinate"><span>)</span></div>';
+  }
+  $('inputs').innerHTML=h;
+  $('check').disabled=false;
+  const f=$('x0'); if(f) f.focus();
+}
+function check(){
+  if(state.answered||state.chosen===null) return;
+  const idx=state.list[state.i],t=TASKS[idx],n=state.chosen;
+  let ok=(n===t.wp.length);
+  if(ok&&n>0){
+    for(let k=0;k<n;k++){
+      const x=parse($('x'+k).value),y=parse($('y'+k).value);
+      const exp=t.wp[k];
+      const gx=x===exp[0],gy=y===exp[1];
+      $('x'+k).classList.add(gx?'ok':'bad');$('y'+k).classList.add(gy?'ok':'bad');
+      if(!(gx&&gy)) ok=false;
+    }
+  }
+  state.answered=true;
+  [...$('cnt').children].forEach(b=>b.disabled=true);
+  [...document.querySelectorAll('#inputs input')].forEach(i=>i.disabled=true);
+  if(ok) state.pts++;
+  else if(state.wrong.indexOf(idx)<0) state.wrong.push(idx);
+  state.res.push({idx:idx,ok:ok});
+  const fb=$('fb');
+  fb.className='fb '+(ok?'ok':'bad');
+  fb.innerHTML='<strong>'+(ok?'Richtig!':'Nicht ganz.')+'</strong> '+explain(t);
+  $('pts').textContent='Punkte: '+state.pts;
+  $('check').classList.add('hide');
+  $('next').textContent=state.i===state.list.length-1?'Ergebnis anzeigen':'Weiter';
+  $('next').classList.remove('hide');
+}
+function next(){
+  state.i++;
+  if(state.i>=state.list.length) finish(); else show();
+}
+function finish(){
+  $('quiz').classList.add('hide');$('end').classList.remove('hide');
+  const total=state.list.length;
+  $('prog').style.width='100%';
+  $('final').textContent=state.pts+' von '+total+' Punkten';
+  const r=state.pts/total;
+  $('verdict').textContent=r>=0.85?'Sehr gut! Sie erkennen Wendepunkte sicher am Graphen.':(r>=0.6?'Gut! Schauen Sie sich die Aufgaben mit Fehlern noch einmal an.':'Noch Luft nach oben: Sehen Sie Video 2 und 3 noch einmal an und üben Sie die Auto-Methode.');
+  $('ptitle').textContent='Quiz 3: Wendepunkte am Graphen';
+  $('ptotal').textContent=state.pts+' / '+total;
+  const d=new Date();
+  $('pdate').textContent=d.toLocaleDateString('de-DE')+', '+d.toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})+' Uhr';
+  $('plist').innerHTML=state.res.map((r,i)=>'<tr><td>Aufgabe '+(i+1)+'</td><td>'+(r.ok?'richtig':'falsch')+'</td></tr>').join('');
+  if(state.practiceMode){
+    $('note').textContent=state.wrong.length?'':'Übungsrunde geschafft!';
+  }
+  $('practice').classList.toggle('hide',state.wrong.length===0);
+  $('note').textContent=(state.wrong.length===0&&state.practiceMode)?'Übungsrunde geschafft!':'';
+  window.scrollTo(0,0);
+}
+$('go').onclick=()=>start(TASKS.map((_,i)=>i));
+$('check').onclick=check;
+$('next').onclick=next;
+$('again').onclick=()=>start(TASKS.map((_,i)=>i));
+$('practice').onclick=()=>{const w=state.wrong.slice();start(w);state.practiceMode=true;};
+document.addEventListener('keydown',e=>{ if(e.key==='Enter'){ if(!$('check').classList.contains('hide')&&!$('check').disabled) check(); else if(!$('next').classList.contains('hide')) next(); }});
+</script>
+</body>
+</html>
